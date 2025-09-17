@@ -1,6 +1,7 @@
 # README.md
 
-**Guía docente (versión simple)**  
+# App: https://grafos.streamlit.app/:
+
 **Explorador interactivo de grafos**
 
 ---
