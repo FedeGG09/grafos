@@ -1,17 +1,14 @@
-# README_teaching.md
+# README.md
 
 **Guía docente (versión simple)**  
-**Explorador interactivo de grafos (Colab + Streamlit)**
+**Explorador interactivo de grafos**
 
 ---
 
-## Propósito (en palabras simples)
-Este repositorio enseña cómo transformar una tabla (CSV) en un **grafo** y cómo analizarlo y visualizarlo de forma interactiva.  
-La idea clave: cada **valor** de una columna se convierte en un **nodo** (ej. `autor::Gabriel García Márquez`) y dos nodos se conectan si **co-ocurren en la misma fila**.  
+## Propósito 
+Este repositorio muestra cómo transformar una tabla (CSV) en un **grafo** y cómo analizarlo y visualizarlo de forma interactiva.  
+La idea clave: cada **valor** de una columna se convierte en un **nodo**  y dos nodos se conectan si **co-ocurren en la misma fila**.  
 
-El material está pensado para usar en clase: hay código listo para Google Colab y una app en Streamlit para explorar sin programar mucho.
-
----
 
 ## Estructura del repo (qué archivos y carpetas hay)
 ```
@@ -26,39 +23,14 @@ repo-root/
    ├─ metrics.py          # Calcular métricas del grafo
    ├─ visualization.py    # Crear graph.html con pyvis y links de descarga
    └─ utils.py            # Utilidades pequeñas (crear carpetas)
-```
 
----
 
-## Cómo usarlo (rápido, con comandos)
-1. Clonar repo y entrar en la carpeta:
-   ```bash
-   git clone <tu-repo>
-   cd repo-root
-   ```
-2. Crear un entorno virtual e instalar dependencias:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate      # Linux / macOS
-   .venv\Scripts\activate         # Windows
-   pip install -r requirements.txt
-   ```
-3. Ejecutar la app Streamlit:
-   ```bash
-   streamlit run streamlit_app.py
-   ```
-4. En la app: subir `vf.csv` o cualquier CSV, aplicar filtros, generar gráficas y construir el grafo.
 
----
+## Explicación módulo a módulo 
 
-## Explicación docente, módulo a módulo (palabras simples)
-
-A continuación explico cada archivo del directorio `src/` **función por función** con un lenguaje pensado para estudiantes.
-
----
 
 ### `src/data_loader.py`  
-**Qué hace (idea simple):** lee un archivo CSV aunque tenga problemas (diferente separador `;`, `\t`, o encoding `latin1`, etc.).  
+**Qué hace** lee un archivo CSV aunque tenga problemas (diferente separador `;`, `\t`, o encoding `latin1`, etc.).  
 **Por qué lo usamos:** muchos CSV vienen de distintas fuentes y fallan al leerlos; este módulo intenta leerlos de forma inteligente.
 
 **Funciones principales:**
@@ -84,19 +56,19 @@ A continuación explico cada archivo del directorio `src/` **función por funci�
 ---
 
 ### `src/graph_builder.py`  
-**Qué hace (idea simple):** construye el grafo a partir del DataFrame. Cada valor se convierte en nodo y se crean aristas cuando valores aparecen juntos en la misma fila.
+**Qué hace:** construye el grafo a partir del DataFrame. Cada valor se convierte en nodo y se crean aristas cuando valores aparecen juntos en la misma fila.
 
 **Funciones principales:**
 
 - `node_id(col: str, val) -> str`  
-  - **Qué recibe:** nombre de columna (`"autor"`) y un valor (`"Gabriel García Márquez"`).  
-  - **Qué devuelve:** una cadena única para el nodo: `"autor::Gabriel García Márquez"`.  
+  - **Qué recibe:** nombre de columna y un valor.  
+  - **Qué devuelve:** una cadena única para el nodo.  
   - **Por qué:** evita confundir valores iguales que vienen de columnas distintas.
 
 - `build_cooccurrence_graph(df: pd.DataFrame, cols: List[str], min_count: int = 1) -> nx.Graph`  
   - **Qué recibe:**
     - `df`: el DataFrame con tus datos.
-    - `cols`: lista de columnas que quieres usar como entidades/nodos (ej. `['autor','categoria','editorial']`).
+    - `cols`: lista de columnas que quieres usar como entidades/nodos.
     - `min_count`: si >1, elimina aristas con peso menor (filtra ruido).
   - **Qué hace (pasos):**
     1. Crea un grafo vacío `G`.
@@ -104,16 +76,13 @@ A continuación explico cada archivo del directorio `src/` **función por funci�
     3. Recorre cada fila y toma los pares de valores presentes; por cada par suma `1` al `weight` de la arista entre ambos nodos (o la crea si no existía).
     4. Si `min_count > 1`, elimina aristas de peso bajo y nodos aislados.
   - **Qué devuelve:** un `networkx.Graph` con nodos y aristas con `weight`.  
-  - **Ejemplo:**  
-    ```python
-    G = build_cooccurrence_graph(df, ['autor','editorial'])
-    ```
+
   - **Consejo práctico:** construir el grafo puede ser costoso si tienes muchas filas o muchas columnas; filtra antes o elige pocas columnas.
 
----
+
 
 ### `src/metrics.py`  
-**Qué hace (idea simple):** calcula métricas que nos ayudan a entender el grafo: quiénes son los más conectados, quiénes son los puentes entre grupos, cuáles son las comunidades, etc.  
+**Qué hace** calcula métricas que nos ayudan a entender el grafo: quiénes son los más conectados, quiénes son los puentes entre grupos, cuáles son las comunidades, etc.  
 **Importante:** algunas métricas son pesadas en tiempo; el módulo tiene estrategias para acelerar.
 
 **Funciones principales:**
@@ -139,13 +108,9 @@ A continuación explico cada archivo del directorio `src/` **función por funci�
   - **Ejemplo de uso:**
     ```python
     nodes_df, edges_df = compute_graph_metrics(G, approx_betweenness=True)
-    ```
-  - **Nota didáctica:** explicar a lxs estudiantes que betweenness mide cuántos caminos cortos pasan por un nodo (es un indicador de “puente”), pero su cálculo exacto escala mal con el tamaño de la red.
-
----
 
 ### `src/visualization.py`  
-**Qué hace (idea simple):** crea la visualización interactiva en HTML con pyvis y genera enlaces para descargar tablas como CSV desde Streamlit.
+**Qué hace:** crea la visualización interactiva en HTML con pyvis y genera enlaces para descargar tablas como CSV desde Streamlit.
 
 **Funciones principales:**
 
@@ -166,15 +131,13 @@ A continuación explico cada archivo del directorio `src/` **función por funci�
 ---
 
 ### `src/utils.py`  
-**Qué hace (idea simple):** funciones pequeñas de ayuda (por ejemplo, crear carpetas si no existen).
+**Qué hace:** funciones pequeñas de ayuda (por ejemplo, crear carpetas si no existen).
 
 **Función principal:**
 
 - `ensure_dir(path: str)`  
   - **Qué hace:** crea una carpeta si no existe y devuelve la ruta.
   - **Uso típico:** guardar `outputs/graph.html` o `outputs/nodes_metrics.csv`.
-
----
 
 # `streamlit_app.py` — qué hace en simples pasos
 
@@ -186,33 +149,4 @@ A continuación explico cada archivo del directorio `src/` **función por funci�
 - Permite construir el grafo seleccionando columnas; luego calcula métricas y muestra top-nodos.
 - Genera el `graph.html` con pyvis y lo embebe en la app (si no es demasiado grande).
 
----
 
-## Consejos rápidos (para el docente / para producción)
-
-- Para datasets grandes:
-  - Filtrar antes de construir el grafo.
-  - Usar `approx_betweenness=True` para ahorrar tiempo.
-  - Usar `max_nodes_to_show` pequeño para la visualización.
-- Si `igraph` presenta problemas de instalación, `python-louvain` es un buen fallback.
-- Si `networkx` es una versión antigua (no soporta `k` en betweenness), actualizarlo o aceptar cálculo exacto con más tiempo.
-
----
-
-## Ejemplo de uso mínimo (resumen de comandos)
-```python
-from src.data_loader import load_csv_smart
-from src.graph_builder import build_cooccurrence_graph
-from src.metrics import compute_graph_metrics
-from src.visualization import pyvis_graph_to_html
-
-df = load_csv_smart("vf.csv")
-G = build_cooccurrence_graph(df, ['autor','categoria'])
-nodes_df, edges_df = compute_graph_metrics(G, approx_betweenness=True)
-pyvis_graph_to_html(G, nodes_df, "outputs/graph.html", max_nodes_to_show=500)
-```
-
----
-
-## Final — copia y pega
-Puedes copiar todo este documento tal cual y pegarlo en `README_teaching.md` en tu repositorio GitHub. Está diseñado para ser claro, didáctico y listo para estudiantes o colaboradores que quieran entender cada módulo y función con ejemplos prácticos.
