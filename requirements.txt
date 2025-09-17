@@ -1,0 +1,14 @@
+streamlit
+pandas
+numpy
+networkx
+pyvis
+plotly
+scipy
+python-louvain
+igraph
+gdown
+matplotlib
+scikit-learn
+chardet
+lxml
